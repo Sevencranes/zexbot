@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="website/public/logo.png" alt="ZexBot" width="120" height="120" />
+<img src="../logo.png" alt="ZexBot" width="120" height="120" />
 
 # ZexBot
 
