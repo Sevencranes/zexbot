@@ -1,0 +1,10 @@
+{
+  "ws_url": "ws://127.0.0.1:3001",
+  "token": "",
+  "private_message_enabled": true,
+  "enabled_group_ids": [],
+  "web_host": "0.0.0.0",
+  "web_port": 8080,
+  "plugins_dir": "plugins",
+  "disabled_plugins": []
+}

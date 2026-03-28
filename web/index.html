@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZexBot 控制台</title>
+  <link rel="icon" type="image/png" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-title">ZexBot</span>
+        <span class="brand-sub" id="metaVer"></span>
+      </div>
+      <nav class="nav">
+        <button type="button" class="nav-btn is-active" data-page="console">首页 · 控制台</button>
+        <button type="button" class="nav-btn" data-page="manage">管理</button>
+        <button type="button" class="nav-btn" data-page="plugins">插件</button>
+        <button type="button" class="nav-btn" data-page="logs">日志</button>
+        <button type="button" class="nav-btn" data-page="about">关于</button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="muted">作者 Zex</span>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <h1 id="pageTitle">控制台</h1>
+        <div class="status-pill" id="statusPill">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">未运行</span>
+        </div>
+      </header>
+
+      <section id="page-console" class="page is-visible">
+        <div class="grid">
+          <article class="card">
+            <h2 class="card-title">连接模块</h2>
+            <p class="card-desc">正向 WebSocket（OneBot 11）。请与 LLBot 中配置的地址、Token 保持一致。</p>
+            <div class="field">
+              <label for="wsUrl">WebSocket 地址</label>
+              <input id="wsUrl" type="text" autocomplete="off" placeholder="ws://127.0.0.1:3001" />
+            </div>
+            <div class="field">
+              <label for="token">Token</label>
+              <input id="token" type="password" autocomplete="off" placeholder="可选" />
+            </div>
+            <div class="actions">
+              <button type="button" class="btn btn-blue" id="btnSaveCfg">保存配置</button>
+              <button type="button" class="btn btn-gray" id="btnReloadCfg">从磁盘重载</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <h2 class="card-title">启动模块</h2>
+            <p class="card-desc">启动后将连接上述 WebSocket，并加载 <code>zexbot/plugins</code> 下各子文件夹（每个文件夹即一个插件，须含 <code>plugin.py</code>）。</p>
+            <div class="actions">
+              <button type="button" class="btn btn-green" id="btnStart">启动机器人</button>
+              <button type="button" class="btn btn-pink" id="btnStop">关闭机器人</button>
+            </div>
+            <p class="hint" id="connHint"></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="page-manage" class="page">
+        <div class="grid">
+          <article class="card">
+            <h2 class="card-title">私聊消息</h2>
+            <p class="card-desc">关闭后，插件将不再收到私聊消息事件。</p>
+            <label class="switch">
+              <input type="checkbox" id="togglePrivate" />
+              <span>处理私聊消息</span>
+            </label>
+          </article>
+
+          <article class="card card-wide">
+            <div class="card-head">
+              <div>
+                <h2 class="card-title">QQ 群范围</h2>
+                <p class="card-desc">仅对已启用的群处理群消息。请先启动并连接机器人，再刷新群列表。</p>
+              </div>
+              <button type="button" class="btn btn-blue btn-sm" id="btnRefreshGroups">刷新群列表</button>
+            </div>
+            <div class="split">
+              <div class="panel">
+                <h3 class="panel-title tag-green">已启用群聊</h3>
+                <ul class="list" id="listEnabled"></ul>
+              </div>
+              <div class="panel">
+                <h3 class="panel-title tag-gray">未启用群聊</h3>
+                <ul class="list" id="listDisabled"></ul>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="page-plugins" class="page">
+        <article class="card card-wide">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">插件列表</h2>
+              <p class="card-desc">默认开启；关闭后该插件不再参与事件处理。配置从各插件目录下 <code>admin</code> 中的页面加载（弹窗内展示）。</p>
+            </div>
+            <button type="button" class="btn btn-gray btn-sm" id="btnRefreshPlugins">刷新列表</button>
+          </div>
+          <div class="plugin-grid" id="pluginGrid"></div>
+        </article>
+      </section>
+
+      <section id="page-logs" class="page">
+        <article class="card card-wide">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">运行日志</h2>
+              <p class="card-desc">最近若干条宿主与插件日志（内存环形缓冲）。开启「实时刷新」后将每隔 2 秒拉取；清理仅清空当前内存中的日志。</p>
+            </div>
+            <div class="log-toolbar">
+              <label class="switch switch-inline">
+                <input type="checkbox" id="toggleLogsRealtime" />
+                <span>实时刷新</span>
+              </label>
+              <button type="button" class="btn btn-blue btn-sm" id="btnRefreshLogs">刷新</button>
+              <button type="button" class="btn btn-pink btn-sm" id="btnClearLogs">清理日志</button>
+            </div>
+          </div>
+          <pre class="log-box" id="logBox"></pre>
+        </article>
+      </section>
+
+      <section id="page-about" class="page">
+        <div class="grid">
+          <article class="card card-wide">
+            <h2 class="card-title">ZexBot</h2>
+            <p class="card-desc">
+              面向 OneBot 11 的插件式 QQ 机器人宿主：Web 控制台管理连接与群范围，插件以目录形式扩展，事件通过统一钩子分发。
+            </p>
+            <dl class="about-meta">
+              <div class="about-meta-row">
+                <dt>名称</dt>
+                <dd id="aboutName">—</dd>
+              </div>
+              <div class="about-meta-row">
+                <dt>版本</dt>
+                <dd id="aboutVersion">—</dd>
+              </div>
+              <div class="about-meta-row">
+                <dt>作者</dt>
+                <dd id="aboutAuthor">—</dd>
+              </div>
+            </dl>
+          </article>
+          <article class="card">
+            <h2 class="card-title">技术栈</h2>
+            <ul class="about-list">
+              <li>FastAPI · Uvicorn（控制台 HTTP）</li>
+              <li>正向 WebSocket（OneBot 11，兼容常见实现）</li>
+              <li>插件：<code>plugin.py</code>、可选 <code>config.json</code> 与 <code>admin/</code> 配置页</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h2 class="card-title">使用提示</h2>
+            <ul class="about-list">
+              <li>控制台端口与 WS 地址等在 <code>data/config.json</code> 中配置；便携打包版位于 exe 同目录。</li>
+              <li>插件资源与可写目录请以各插件说明为准；群管等能力依赖机器人在群内的协议权限。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <div id="pluginModal" class="modal" hidden>
+    <div class="modal-backdrop" id="pluginModalBackdrop"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="pluginModalTitle">
+      <div class="modal-head">
+        <span class="modal-title" id="pluginModalTitle">插件配置</span>
+        <button type="button" class="btn btn-gray btn-sm" id="pluginModalClose">关闭</button>
+      </div>
+      <iframe class="modal-frame" id="pluginModalFrame" title="插件配置"></iframe>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "keyword": "帮助",
+      "reply": "这是关键词回复示例：消息包含「帮助」时会回复本句。可在控制台「插件」中编辑规则。",
+      "mode": "fuzzy"
+    },
+    {
+      "keyword": "ping",
+      "reply": "pong",
+      "mode": "exact"
+    }
+  ]
+}

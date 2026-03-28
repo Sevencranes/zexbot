@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>关键词回复 · 配置</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --pink: #db2777;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+    h1 { font-size: 1.1rem; margin: 0 0 12px; }
+    .hint { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+    .row {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    .row-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .row-title { font-weight: 600; font-size: 13px; }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .btn-blue { background: var(--blue); }
+    .btn-green { background: var(--green); }
+    .btn-pink { background: var(--pink); }
+    .btn-gray { background: #475569; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .err { color: var(--pink); font-size: 13px; margin-top: 8px; }
+    .ok { color: var(--green); font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>关键词回复</h1>
+  <p class="hint">自上而下匹配，命中第一条规则后即回复并停止。模式：<strong>模糊</strong>为消息包含关键词；<strong>准确</strong>为整句与关键词一致（忽略首尾空格）。</p>
+  <div id="rows"></div>
+  <div class="actions">
+    <button type="button" class="btn btn-gray" id="btnAdd">添加规则</button>
+    <button type="button" class="btn btn-green" id="btnSave">保存配置</button>
+  </div>
+  <div id="msg"></div>
+  <script>
+    function symbolFromPath() {
+      var p = location.pathname.replace(/\/$/, "").split("/");
+      return p[p.length - 2];
+    }
+    var SYM = symbolFromPath();
+    var API_BASE = "/api/plugins/" + encodeURIComponent(SYM) + "/config";
+
+    function rowEl(r, idx) {
+      var w = document.createElement("div");
+      w.className = "row";
+      w.innerHTML =
+        '<div class="row-head"><span class="row-title">规则 #' + (idx + 1) + '</span>' +
+        '<button type="button" class="btn btn-pink rm">删除</button></div>' +
+        '<label>关键词</label><input type="text" class="inp-kw" value="" />' +
+        '<label style="margin-top:10px">回复内容</label><textarea class="inp-re"></textarea>' +
+        '<label style="margin-top:10px">判断模式</label><select class="inp-mode">' +
+        '<option value="fuzzy">模糊关键词</option><option value="exact">准确关键词</option></select>';
+      w.querySelector(".inp-kw").value = r.keyword || "";
+      w.querySelector(".inp-re").value = r.reply || "";
+      w.querySelector(".inp-mode").value = r.mode === "exact" ? "exact" : "fuzzy";
+      w.querySelector(".rm").addEventListener("click", function () {
+        w.remove();
+      });
+      return w;
+    }
+
+    var box = document.getElementById("rows");
+    var msg = document.getElementById("msg");
+
+    function show(text, isErr) {
+      msg.textContent = text;
+      msg.className = isErr ? "err" : "ok";
+    }
+
+    function collect() {
+      var rules = [];
+      box.querySelectorAll(".row").forEach(function (w) {
+        var kw = w.querySelector(".inp-kw").value.trim();
+        var reply = w.querySelector(".inp-re").value;
+        var mode = w.querySelector(".inp-mode").value;
+        if (kw) rules.push({ keyword: kw, reply: reply, mode: mode });
+      });
+      return { rules: rules };
+    }
+
+    document.getElementById("btnAdd").addEventListener("click", function () {
+      box.appendChild(rowEl({ keyword: "", reply: "", mode: "fuzzy" }, box.children.length));
+    });
+
+    document.getElementById("btnSave").addEventListener("click", function () {
+      fetch(API_BASE, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(collect()),
+      })
+        .then(function (r) {
+          if (!r.ok) return r.json().then(function (j) { throw new Error(j.detail || r.statusText); });
+          return r.json();
+        })
+        .then(function () { show("已保存"); })
+        .catch(function (e) { show(String(e.message || e), true); });
+    });
+
+    fetch(API_BASE)
+      .then(function (r) {
+        if (!r.ok) throw new Error("加载失败");
+        return r.json();
+      })
+      .then(function (data) {
+        box.innerHTML = "";
+        var rules = data.rules || [];
+        if (rules.length === 0) rules.push({ keyword: "", reply: "", mode: "fuzzy" });
+        rules.forEach(function (r, i) {
+          box.appendChild(rowEl(r, i));
+        });
+      })
+      .catch(function (e) {
+        show(String(e.message || e), true);
+      });
+  </script>
+</body>
+</html>

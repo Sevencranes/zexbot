@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>群管套件 · 配置</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --pink: #db2777;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      padding-bottom: 48px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+    h1 { font-size: 1.15rem; margin: 0 0 8px; }
+    .lead { color: var(--muted); margin: 0 0 16px; line-height: 1.55; font-size: 13px; }
+    section {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 14px 6px;
+      margin-bottom: 14px;
+      background: #f8fafc;
+    }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      font-weight: 650;
+      color: #334155;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+    @media (max-width: 720px) {
+      .grid2 { grid-template-columns: 1fr; }
+    }
+    .field { margin-bottom: 12px; }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    textarea { min-height: 64px; resize: vertical; }
+    input.chk { width: auto; margin-right: 8px; }
+    .inline { display: flex; align-items: flex-start; }
+    .inline label { margin: 0; font-size: 14px; color: var(--text); }
+    .row-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .row-title { font-weight: 600; font-size: 13px; }
+    .ent-row {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .btn-blue { background: var(--blue); }
+    .btn-green { background: var(--green); }
+    .btn-pink { background: var(--pink); }
+    .btn-gray { background: #475569; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .err { color: var(--pink); font-size: 13px; margin-top: 10px; white-space: pre-wrap; }
+    .ok { color: var(--green); font-size: 13px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>群管套件</h1>
+  <p class="lead">用表单维护配置，保存后写入 <code>config.json</code> 并通知插件重载。占位符：<code>{target}</code> <code>{sec}</code> <code>{at}</code> <code>{qq}</code> <code>{nick}</code> <code>{group}</code>；娱乐回复另有 <code>{签文}</code> <code>{点数}</code> <code>{人品}</code> <code>{random}</code>。</p>
+
+  <section>
+    <h2>基础</h2>
+    <div class="grid2">
+      <div class="field">
+        <label for="f_prefix">命令触发前缀</label>
+        <input type="text" id="f_prefix" maxlength="8" />
+        <p class="hint">如 # 表示群内以 # 开头解析群管命令。</p>
+      </div>
+      <div class="field">
+        <label for="f_menu_title">菜单标题（首行）</label>
+        <input type="text" id="f_menu_title" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="f_super">超管 QQ（全群绕过群主/管理员校验）</label>
+      <textarea id="f_super" rows="3" placeholder="每行一个 QQ 号，或英文逗号分隔"></textarea>
+    </div>
+    <div class="field inline">
+      <input type="checkbox" id="f_kick_reject" class="chk" />
+      <label for="f_kick_reject">踢人时拒绝对方再次加群（视协议端是否支持）</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>命令词</h2>
+    <p class="hint" style="margin-top:-6px;margin-bottom:12px">多个词用<strong>中文逗号</strong>或<strong>英文逗号</strong>分隔。</p>
+    <div class="grid2">
+      <div class="field">
+        <label for="w_menu">菜单 / 帮助</label>
+        <input type="text" id="w_menu" />
+      </div>
+      <div class="field">
+        <label for="w_mute">禁言</label>
+        <input type="text" id="w_mute" />
+      </div>
+      <div class="field">
+        <label for="w_unmute">解除禁言</label>
+        <input type="text" id="w_unmute" />
+      </div>
+      <div class="field">
+        <label for="w_kick">踢出</label>
+        <input type="text" id="w_kick" />
+      </div>
+      <div class="field">
+        <label for="w_ban_on">全员禁言 · 开启</label>
+        <input type="text" id="w_ban_on" />
+      </div>
+      <div class="field">
+        <label for="w_ban_off">全员禁言 · 关闭</label>
+        <input type="text" id="w_ban_off" />
+      </div>
+      <div class="field">
+        <label for="w_recall">撤回（需回复目标消息）</label>
+        <input type="text" id="w_recall" />
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>提示与成功文案</h2>
+    <div class="grid2">
+      <div class="field">
+        <label for="t_deny">无权限时回复</label>
+        <input type="text" id="t_deny" />
+      </div>
+      <div class="field">
+        <label for="t_private">私聊使用群管功能时回复</label>
+        <input type="text" id="t_private" />
+      </div>
+      <div class="field">
+        <label for="t_bad_mute">禁言参数错误提示</label>
+        <input type="text" id="t_bad_mute" />
+      </div>
+      <div class="field">
+        <label for="t_bad_kick">踢人参数错误提示</label>
+        <input type="text" id="t_bad_kick" />
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label for="t_fail_pre">协议失败时的前缀</label>
+        <input type="text" id="t_fail_pre" />
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="s_mute_ok">禁言成功</label>
+        <input type="text" id="s_mute_ok" placeholder="已对 {target} 禁言 {sec} 秒。" />
+      </div>
+      <div class="field">
+        <label for="s_unmute_ok">解除禁言成功</label>
+        <input type="text" id="s_unmute_ok" />
+      </div>
+      <div class="field">
+        <label for="s_kick_ok">踢人成功</label>
+        <input type="text" id="s_kick_ok" />
+      </div>
+      <div class="field">
+        <label for="s_whole_on">全员禁言开启成功</label>
+        <input type="text" id="s_whole_on" />
+      </div>
+      <div class="field">
+        <label for="s_whole_off">全员禁言关闭成功</label>
+        <input type="text" id="s_whole_off" />
+      </div>
+      <div class="field">
+        <label for="s_recall_ok">撤回成功</label>
+        <input type="text" id="s_recall_ok" />
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>进群欢迎</h2>
+    <div class="field inline" style="margin-bottom:12px">
+      <input type="checkbox" id="f_welcome_on" class="chk" />
+      <label for="f_welcome_on">在控制台「已启用群」内，新人进群自动发欢迎（依赖群内通知事件）</label>
+    </div>
+    <div class="field">
+      <label for="f_welcome_tpl">欢迎模板</label>
+      <textarea id="f_welcome_tpl" rows="2"></textarea>
+      <p class="hint">可用 {at}（@ 新人）、{qq}、{nick}、{group}。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>签文库（抽签 {签文}）</h2>
+    <div class="field">
+      <label for="f_fortune">每条一行</label>
+      <textarea id="f_fortune" rows="5"></textarea>
+    </div>
+  </section>
+
+  <section>
+    <h2>娱乐命令（无需命令前缀即可触发，或 #词 整句包含触发词）</h2>
+    <div id="ent_box"></div>
+    <button type="button" class="btn btn-gray" id="btnAddEnt">添加一条</button>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="btn btn-green" id="btnSave">保存全部配置</button>
+  </div>
+  <div id="msg"></div>
+
+  <script>
+    function symbolFromPath() {
+      var p = location.pathname.replace(/\/$/, "").split("/");
+      return p[p.length - 2];
+    }
+    var SYM = symbolFromPath();
+    var API = "/api/plugins/" + encodeURIComponent(SYM) + "/config";
+
+    function splitWords(s) {
+      if (!s || !String(s).trim()) return [];
+      return String(s)
+        .split(/[,，\n\r]+/)
+        .map(function (x) { return x.trim(); })
+        .filter(Boolean);
+    }
+
+    function joinWords(arr) {
+      if (!arr || !arr.length) return "";
+      return arr.join("，");
+    }
+
+    function parseSuper(s) {
+      var out = [];
+      String(s || "")
+        .split(/[,，\n\r]+/)
+        .map(function (x) { return x.trim(); })
+        .forEach(function (x) {
+          if (!x) return;
+          var n = parseInt(x, 10);
+          if (!isNaN(n)) out.push(n);
+        });
+      return out;
+    }
+
+    function entRow(data, idx) {
+      var wrap = document.createElement("div");
+      wrap.className = "ent-row";
+      wrap.innerHTML =
+        '<div class="row-head"><span class="row-title">娱乐 #' + (idx + 1) + '</span>' +
+        '<button type="button" class="btn btn-pink rm">删除</button></div>' +
+        '<div class="field"><label>触发词（逗号分隔）</label><input type="text" class="ew" /></div>' +
+        '<div class="field"><label>匹配方式</label><select class="em">' +
+        '<option value="模糊">模糊（消息中包含该词）</option>' +
+        '<option value="精确">精确（去掉命令前缀后与某一词全等）</option></select></div>' +
+        '<div class="field"><label>回复模板</label><textarea class="er" rows="2"></textarea></div>';
+      wrap.querySelector(".ew").value = joinWords(data["词"] || []);
+      wrap.querySelector(".em").value = data["匹配"] === "精确" || data["匹配"] === "exact" ? "精确" : "模糊";
+      wrap.querySelector(".er").value = data["回复"] || "";
+      wrap.querySelector(".rm").addEventListener("click", function () { wrap.remove(); });
+      return wrap;
+    }
+
+    var entBox = document.getElementById("ent_box");
+    function addEnt(d) {
+      entBox.appendChild(entRow(d || { 词: [], 回复: "", 匹配: "模糊" }, entBox.children.length));
+    }
+
+    document.getElementById("btnAddEnt").addEventListener("click", function () {
+      addEnt({ 词: [], 回复: "", 匹配: "模糊" });
+    });
+
+    function applyData(data) {
+      data = data || {};
+      document.getElementById("f_prefix").value = data["命令前缀"] != null ? data["命令前缀"] : "#";
+      document.getElementById("f_menu_title").value = data["菜单标题"] != null ? data["菜单标题"] : "";
+      document.getElementById("f_super").value = (data["超管QQ"] || []).join("\n");
+      document.getElementById("f_kick_reject").checked = !!data["踢人拒绝再次加群"];
+      document.getElementById("w_menu").value = joinWords(data["菜单命令词"]);
+      document.getElementById("w_mute").value = joinWords(data["禁言命令词"]);
+      document.getElementById("w_unmute").value = joinWords(data["解除禁言命令词"]);
+      document.getElementById("w_kick").value = joinWords(data["踢人命令词"]);
+      document.getElementById("w_ban_on").value = joinWords(data["全员禁言开"]);
+      document.getElementById("w_ban_off").value = joinWords(data["全员禁言关"]);
+      document.getElementById("w_recall").value = joinWords(data["撤回命令词"]);
+      document.getElementById("t_deny").value = data["无权限回复"] || "";
+      document.getElementById("t_private").value = data["仅群内回复"] || "";
+      document.getElementById("t_bad_mute").value = data["参数错误禁言"] || "";
+      document.getElementById("t_bad_kick").value = data["参数错误踢"] || "";
+      document.getElementById("t_fail_pre").value = data["操作失败前缀"] || "";
+      document.getElementById("s_mute_ok").value = data["禁言成功模板"] || "已对 {target} 禁言 {sec} 秒。";
+      document.getElementById("s_unmute_ok").value = data["解除禁言成功模板"] || "已解除 {target} 的禁言。";
+      document.getElementById("s_kick_ok").value = data["踢人成功模板"] || "已移出 {target}。";
+      document.getElementById("s_whole_on").value = data["全员禁言开成功"] || "已开启全员禁言。";
+      document.getElementById("s_whole_off").value = data["全员禁言关成功"] || "已关闭全员禁言。";
+      document.getElementById("s_recall_ok").value = data["撤回成功模板"] || "已撤回目标消息。";
+      document.getElementById("f_welcome_on").checked = !!data["进群发欢迎"];
+      document.getElementById("f_welcome_tpl").value = data["进群欢迎模板"] || "欢迎 {at} 进群！";
+      document.getElementById("f_fortune").value = (data["签文库"] || []).join("\n");
+      entBox.innerHTML = "";
+      var list = data["娱乐命令"];
+      if (!list || !list.length) list = [{ 词: [], 回复: "", 匹配: "模糊" }];
+      list.forEach(function (row) { addEnt(row); });
+    }
+
+    function collect() {
+      var ents = [];
+      entBox.querySelectorAll(".ent-row").forEach(function (w) {
+        var words = splitWords(w.querySelector(".ew").value);
+        var reply = w.querySelector(".er").value;
+        if (!words.length && !String(reply).trim()) return;
+        ents.push({
+          词: words,
+          匹配: w.querySelector(".em").value,
+          回复: reply
+        });
+      });
+      return {
+        命令前缀: document.getElementById("f_prefix").value.trim() || "#",
+        菜单标题: document.getElementById("f_menu_title").value.trim() || "━━ 群管 ━━",
+        超管QQ: parseSuper(document.getElementById("f_super").value),
+        踢人拒绝再次加群: document.getElementById("f_kick_reject").checked,
+        菜单命令词: splitWords(document.getElementById("w_menu").value),
+        禁言命令词: splitWords(document.getElementById("w_mute").value),
+        解除禁言命令词: splitWords(document.getElementById("w_unmute").value),
+        踢人命令词: splitWords(document.getElementById("w_kick").value),
+        全员禁言开: splitWords(document.getElementById("w_ban_on").value),
+        全员禁言关: splitWords(document.getElementById("w_ban_off").value),
+        撤回命令词: splitWords(document.getElementById("w_recall").value),
+        无权限回复: document.getElementById("t_deny").value,
+        仅群内回复: document.getElementById("t_private").value,
+        参数错误禁言: document.getElementById("t_bad_mute").value,
+        参数错误踢: document.getElementById("t_bad_kick").value,
+        操作失败前缀: document.getElementById("t_fail_pre").value,
+        禁言成功模板: document.getElementById("s_mute_ok").value,
+        解除禁言成功模板: document.getElementById("s_unmute_ok").value,
+        踢人成功模板: document.getElementById("s_kick_ok").value,
+        全员禁言开成功: document.getElementById("s_whole_on").value,
+        全员禁言关成功: document.getElementById("s_whole_off").value,
+        撤回成功模板: document.getElementById("s_recall_ok").value,
+        进群发欢迎: document.getElementById("f_welcome_on").checked,
+        进群欢迎模板: document.getElementById("f_welcome_tpl").value,
+        签文库: document.getElementById("f_fortune").value.split(/[\n\r]+/).map(function (x) { return x.trim(); }).filter(Boolean),
+        娱乐命令: ents
+      };
+    }
+
+    var msgEl = document.getElementById("msg");
+    function show(text, bad) {
+      msgEl.textContent = text;
+      msgEl.className = bad ? "err" : "ok";
+    }
+
+    document.getElementById("btnSave").addEventListener("click", function () {
+      var body = collect();
+      fetch(API, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) {
+          if (!r.ok) return r.json().then(function (j) { throw new Error(j.detail || r.statusText); });
+          return r.json();
+        })
+        .then(function () { show("已保存"); })
+        .catch(function (e) { show(String(e.message || e), true); });
+    });
+
+    fetch(API)
+      .then(function (r) {
+        if (!r.ok) throw new Error("加载失败");
+        return r.json();
+      })
+      .then(applyData)
+      .catch(function (e) {
+        show(String(e.message || e), true);
+        applyData({});
+      });
+  </script>
+</body>
+</html>
